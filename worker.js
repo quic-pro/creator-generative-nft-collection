@@ -24,7 +24,7 @@ async function generate(startChunk, numberWorker, tasks) {
 
         await images[0].resize(IMAGE_SIZE, IMAGE_SIZE); // resize img
         await images[0].write(OUTPUT_PATH + numImg.toString() + '.png'); // save img
-        console.log(`[${numberWorker}]: #${j} time: ${(Date.now() - startTime) / 1000}`);
+        console.log(`[${numberWorker}]: #${j}(${numImg}) time: ${(Date.now() - startTime) / 1000}`);
     }
 }
 
