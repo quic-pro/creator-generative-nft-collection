@@ -20,11 +20,13 @@ class Generator {
         }
     }
 
-    start(tasks) {
-        const sizeChunk = tasks.length / this.numberOfWorkers;
+    start(startGlobalChunk, endGlobalChunk, tasks) {
+        const sizeChunk = (endGlobalChunk - startGlobalChunk) / this.numberOfWorkers;
         for (let i = 0; i < this.numberOfWorkers; ++i) {
-            this.workers[i].postMessage({numberWorker: i, tasks: tasks.slice(sizeChunk * i, sizeChunk * (i + 1))});
+            console.log(`[${i}]: Chunk ${startGlobalChunk + sizeChunk * i} - ${startGlobalChunk + sizeChunk * (i + 1)}`);
+            this.workers[i].postMessage({startChunk: startGlobalChunk, numberWorker: i, tasks: tasks.slice(startGlobalChunk + sizeChunk * i, startGlobalChunk + sizeChunk * (i + 1))});
         }
+        console.log();
     }
 }
 
@@ -57,14 +59,19 @@ async function main() {
         result = next;
     }
 
-    const startTime = Date.now();
-    console.log('Start timestamp:', startTime);
-    console.log('Number of images:', result.length);
-
     const generator = new Generator(COUNT_THREADS);
 
     const chunkSize = result.length / COUNT_COMPUTER;
-    generator.start(result.slice(COMPUTER_NUMBER * chunkSize, (COMPUTER_NUMBER + 1) * chunkSize));
+    const startChunk = COMPUTER_NUMBER * chunkSize;
+    const endChunk = (COMPUTER_NUMBER + 1) * chunkSize;
+
+    console.log('Number of images:', result.length);
+    console.log(`Chunk: ${startChunk} - ${endChunk}\n`);
+
+    const startTime = Date.now();
+    console.log(`Start timestamp: ${startTime}\n`);
+    generator.start(startChunk, endChunk, result);
+
 }
 
 main();
